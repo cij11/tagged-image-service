@@ -1,6 +1,7 @@
 import fileUpload from 'express-fileupload'
 import { Image } from '../entity/image.entity'
 import { imageRepository } from '../repository/image.repository'
+import { ImageFilterRequest } from '../type/image-filter-request.type'
 
 async function getImageModel(imageId: number) {
     return imageRepository.getImageModel(imageId)
@@ -27,6 +28,10 @@ async function createImage(file: fileUpload.UploadedFile) {
     return imageRepository.createImage(image)
 }
 
+async function filterImages(imageFilterRequest: ImageFilterRequest) {
+    return imageRepository.filterImages(imageFilterRequest)
+}
+
 async function updateImage(imageId: number, image: Image) {
     return imageRepository.updateImage(imageId, image)
 }
@@ -34,6 +39,7 @@ async function updateImage(imageId: number, image: Image) {
 export const imageService = {
     getImageModel,
     getImageFilePath,
+    filterImages,
     createImage,
     updateImage,
 }

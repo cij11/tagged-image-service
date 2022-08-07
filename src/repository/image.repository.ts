@@ -1,12 +1,54 @@
 import fileUpload from 'express-fileupload'
 import { getConnection } from '../app-data-source'
 import { Image } from '../entity/image.entity'
+import { ImageFilterRequest } from '../type/image-filter-request.type'
 
 async function getImageModel(imageId: number) {
     const connection = await getConnection()
     const repo = connection.getRepository(Image)
 
     return repo.findOneByOrFail({ id: imageId })
+}
+
+async function filterImages(imageFilterRequest?: ImageFilterRequest) {
+    const connection = await getConnection()
+    const query = connection
+        .getRepository(Image)
+        .createQueryBuilder('image')
+        .leftJoinAndSelect('image.tags', 'tag')
+
+    if (!imageFilterRequest) {
+        return query.getMany()
+    }
+
+    if (imageFilterRequest.tagIds) {
+        const tagIdsJoined = imageFilterRequest.tagIds.join(',')
+
+        query.andWhere(
+            'image.id IN ' +
+                query
+                    .subQuery() // Subquery to select imageIds that have a relationship with any of the given tagIds
+                    .select('imageSub.id')
+                    .from(Image, 'imageSub')
+                    .innerJoin('imageSub.tags', 'tagSub')
+                    .where(`tagSub.id IN (${tagIdsJoined})`) // TODO. Investigate why this fails when using the format: .where(`tag2.id IN (:tagIdsJoined})`, {tagIdsJoined})
+                    .getQuery()
+        )
+    }
+
+    if (imageFilterRequest.createdAtFrom) {
+        query.andWhere('image.createdAt >= :createdAtFrom', {
+            createdAtFrom: imageFilterRequest.createdAtFrom,
+        })
+    }
+
+    if (imageFilterRequest.createdAtFrom) {
+        query.andWhere('image.createdAt <= :createdAtTo', {
+            createdAtTo: imageFilterRequest.createdAtTo,
+        })
+    }
+
+    return query.getMany()
 }
 
 async function createImage(requestImage: Image) {
@@ -53,6 +95,7 @@ async function updateImage(imageId: number, requestImage: Image) {
 
 export const imageRepository = {
     getImageModel,
+    filterImages,
     createImage,
     storeImage,
     updateImage,

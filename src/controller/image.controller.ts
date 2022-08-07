@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { UploadedFile } from 'express-fileupload'
 import { imageService } from '../service/image.service'
+import { ImageFilterRequest } from '../type/image-filter-request.type'
 import { MimeType } from '../type/mime-type.type'
 import { RequestHeaderType } from '../type/request-header.type'
 
@@ -35,6 +36,19 @@ async function getImage(req: Request, res: Response, next: NextFunction) {
         }
     } catch (err) {
         console.error('Error while getting image', err.message)
+        next(err)
+    }
+}
+
+async function searchImages(req: Request, res: Response, next: NextFunction) {
+    try {
+        res.json(
+            await imageService.filterImages(
+                req.query.filter as ImageFilterRequest
+            )
+        )
+    } catch (err) {
+        console.error('Error while searching images', err.message)
         next(err)
     }
 }
@@ -79,6 +93,7 @@ async function updateImage(req: Request, res: Response, next: NextFunction) {
 
 export const imageController = {
     getImage,
+    searchImages,
     createImage,
     updateImage,
 }
