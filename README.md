@@ -37,3 +37,19 @@ CREATE DATABASE tagged_image_service_db;
 GRANT ALL PRIVILEGES ON tagged_image_service_db.\* TO 'tagged_image_service'@'localhost';
 
 ALTER USER 'tagged_image_service'@'localhost' IDENTIFIED BY 'password123';
+
+## Configure App Data Source
+
+If you have deployed a dockerised MYSQL instance, then the database credentials in app-data-source.ts will already be configured.
+If you are using an existing MYSQL instance, set host, port, username, and password in app-data-source.ts
+
+## Run Database Migrations
+
+To run the database migrations to create tables, run
+`npm i`
+`npm run migrate`
+
+## Launch Application
+
+Launch the application by running
+`npm run serve`
