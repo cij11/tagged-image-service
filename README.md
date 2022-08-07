@@ -160,3 +160,5 @@ No per-user logging of interactions.
 -   Expand unit test and end to end test coverage. For the purposes of this time boxed exercise, I did not attempt anything like complete code coverage. A production app would have complete code coverage, and ideally build steps to fail a build if test coverage dropped below an agreed threshold.
 -   Authentication
     -   Implement actual authentication. OAuth2, AWS Cognito, etc.
+-   Use dependency injection
+    -   The architecture of this application is not easy to unit test, with dependencies being imported directly from modules. Dependency injection would greatly help with that. I would rework the application to implement a dependency injection container, or migrate to the NestJs framework.
