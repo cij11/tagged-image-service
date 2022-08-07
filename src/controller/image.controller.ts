@@ -2,10 +2,11 @@ import { NextFunction, Request, Response } from 'express'
 import { UploadedFile } from 'express-fileupload'
 import { imageService } from '../service/image.service'
 import { MimeType } from '../type/mime-type.type'
+import { RequestHeaderType } from '../type/request-header.type'
 
 async function getImage(req: Request, res: Response, next: NextFunction) {
     try {
-        const contentType = req.headers['content-type']
+        const contentType = req.headers[RequestHeaderType.ContentType]
 
         switch (contentType) {
             case MimeType.ApplicationJson: {
