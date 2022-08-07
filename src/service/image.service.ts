@@ -15,12 +15,7 @@ async function getImageFilePath(imageId: number) {
 async function createImage(file: fileUpload.UploadedFile) {
     const filename = file.name
 
-    // TODO: Replace with cloud storage solution
-    file.mv(`${__dirname}/../../public/${file.name}`, (err: Error) => {
-        if (err) {
-            throw new Error(`Error saving image file: ${err.message}`)
-        }
-    })
+    imageRepository.storeImage(file)
 
     const image: Image = {
         filename: filename,

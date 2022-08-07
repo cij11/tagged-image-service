@@ -1,3 +1,4 @@
+import fileUpload from 'express-fileupload'
 import { getConnection } from '../app-data-source'
 import { Image } from '../entity/image.entity'
 
@@ -15,6 +16,15 @@ async function createImage(requestImage: Image) {
     const createdImage = repo.create(requestImage)
 
     return repo.save(createdImage)
+}
+
+function storeImage(file: fileUpload.UploadedFile) {
+    // TODO: Replace with cloud storage solution
+    file.mv(`${__dirname}/../../public/${file.name}`, (err: Error) => {
+        if (err) {
+            throw new Error(`Error saving image file: ${err.message}`)
+        }
+    })
 }
 
 async function updateImage(imageId: number, requestImage: Image) {
@@ -44,5 +54,6 @@ async function updateImage(imageId: number, requestImage: Image) {
 export const imageRepository = {
     getImageModel,
     createImage,
+    storeImage,
     updateImage,
 }
