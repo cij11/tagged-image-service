@@ -5,5 +5,9 @@
         "rootDir": "./",
         "esModuleInterop": true,
         "noImplicitAny": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "outDir": "dist",
+        "sourceMap": true
     }
 }

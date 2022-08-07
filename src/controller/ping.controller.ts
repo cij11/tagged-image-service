@@ -4,7 +4,7 @@ async function getPong(req: Request, res: Response, next: NextFunction) {
     try {
         res.json('pong')
     } catch (err) {
-        console.error('Error while pinging', err.message)
+        console.error('Error while getting pong', err.message)
         next(err)
     }
 }
