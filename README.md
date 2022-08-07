@@ -53,3 +53,12 @@ To run the database migrations to create tables, run
 
 Launch the application by running
 `npm run serve`
+
+## Testing Application
+
+Run unit tests by running
+`npm run test`
+
+Test endpoints by using a REST client such as Insomnia: https://insomnia.rest/
+
+An insomnia collection is included in this repo as tagged-image-service-insomnia-collection.json . This can be imported into insomnia to make calls against the running API immediately.
