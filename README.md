@@ -2,7 +2,21 @@
 
 Service for uploading images, applying tags to images, searching images by tags and upload date, and downloading images.
 
-## Requirements
+## Running locally
+
+Start the service with:
+
+```
+./scripts/start.sh
+```
+
+Stop the service with:
+
+```
+./scripts/stop.sh
+```
+
+## Local Development
 
 1. NodeJS
 1. Docker (if deploying MYSQL inside docker)
@@ -17,11 +31,10 @@ Run the following commands to deploy the dockerised MYSQL
 
 ```
 sudo docker pull mysql/mysql-server:latest
-sudo docker run --name=chris_jolly_tagged_image_service_exercise -d mysql/mysql-server:latest
+sudo docker run --name=chris_jolly_tagged_image_service_db -d mysql/mysql-server:latest
 ```
 
-A mysql database will now be running inside a docker container. Connect to this database with any
-docker client wit
+A mysql database will now be running inside a docker container. Connect to this database with any docker client with
 
 ```
 host:localhost
@@ -33,22 +46,16 @@ password:<leave this blank>
 ## User and Database setup
 
 ```sql
--- We need to set a root database user password to use the database
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'password123';
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password123';
-FLUSH PRIVILEGES;
-
 -- Run these as root to set up user and db
 CREATE USER 'tagged_image_service'@'localhost' IDENTIFIED BY 'password123';
 CREATE DATABASE tagged_image_service_db;
 GRANT ALL PRIVILEGES ON tagged_image_service_db.\* TO 'tagged_image_service'@'localhost';
 
-ALTER USER 'tagged_image_service'@'localhost' IDENTIFIED BY 'password123';
 ```
 
 ## Configure App Data Source
 
-If you have deployed a dockerised MYSQL instance, then the database credentials in app-data-source.ts will already be configured.
+Configure the credentials in app-data-source.ts. If you are using a dockerised mysql instance spun up as per above, you just need to change the host from 'db' to 'localhost'.
 If you are using an existing MYSQL instance, set host, port, username, and password in app-data-source.ts
 
 ## Run Database Migrations
@@ -73,6 +80,21 @@ Run unit tests by running
 Test endpoints by using a REST client such as Insomnia: https://insomnia.rest/
 
 An insomnia collection is included in this repo as tagged-image-service-insomnia-collection.json . This can be imported into insomnia to make calls against the running API immediately.
+
+## Dockerisation
+
+Build the docker image with
+
+```
+docker build . -t chrisjolly25/tagged-image-service
+
+```
+
+Start the docker image with
+
+```
+docker run chrisjolly25/tagged-image-service
+```
 
 ## Design Considerations
 
@@ -155,10 +177,14 @@ No per-user logging of interactions.
     -   If there is any chance this service will surface image models to an end user, we're better using uuids for the id. ids are vulnerable to fishing for hits, if you know the approximate time an image was submitted.
 -   Improve API
     -   Implement json-api across all responses. json-api has some overhead in formatting responses to fit the standard, but simplifies both API design and consumption (by both developers and systems) by following a prescriptive, machine readable standard.
-    -   Standardise error responses. Currently errors thrown are returned directly to the client. Errors should be intercepted before response, and returned in a format that includes the correct error code, a useful message, and detail directing to the erroneous field if applicable. It would be good to extend Error with custom Errors, then catch those at the top level, map them to an error code, and respond. That will unify error responses, and decouple Error responding (a communication concern) from Error throwing (an application logic/implementation concern)
+    -   Standardise error responses. Currently all errors thrown are returned directly to the client. Errors should be intercepted before response, and returned in a format that includes the correct error code, a useful message, and detail directing to the erroneous field if applicable. It would be good to extend Error with custom Errors, then catch those at the top level, map them to an error code, and respond. That will unify error responses, and decouple Error responding (a communication concern) from Error throwing (an application logic/implementation concern)
     -   Validate requests, return useful errors.
 -   Expand unit test and end to end test coverage. For the purposes of this time boxed exercise, I did not attempt anything like complete code coverage. A production app would have complete code coverage, and ideally build steps to fail a build if test coverage dropped below an agreed threshold.
 -   Authentication
     -   Implement actual authentication. OAuth2, AWS Cognito, etc.
 -   Use dependency injection
     -   The architecture of this application is not easy to unit test, with dependencies being imported directly from modules. Dependency injection would greatly help with that. I would rework the application to implement a dependency injection container, or migrate to the NestJs framework.
+-   Dockerisation and local development
+    -   Dockerisation was done late in development, and is not well integrated with local development. A different app-data-source variable is required to connect when the app is running on a laptop vs in docker. Local development should be done by mounting src directly in the container, to have parity between the setups.
+-   Env variables
+    -   In a real world project no env variables would be committed to version control. A team should employ a standardised way of defining env variable keys, and storing and injecting env variables. I need to centralise the env variables, instead of storing them variously in sql files, env files, docker-compose files, and data-source files as is currently the case in this project.

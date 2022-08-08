@@ -5,8 +5,8 @@ export class CreateImageTable1659860793548 implements MigrationInterface {
         await queryRunner.query(
             `CREATE TABLE image (
                     id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                    filename varchar(255)
-                    createdAt DATETIME
+                    filename varchar(255),
+                    createdAt DATETIME,
                     modifiedAt DATETIME
                 );`
         )

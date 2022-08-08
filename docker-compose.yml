@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+    tagged-image-service:
+        build: .
+        image: chrisjolly25/tagged-image-service:latest
+        ports:
+            - '4156:4156'
+        environment:
+            - API_KEY=${API_KEY}
+            - CLIENT_ID=${CLIENT_ID}
+        volumes:
+            - './public:/usr/app/public'
+        depends_on:
+            db:
+                condition: service_healthy
+    db:
+        image: mysql:8.0
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: password123
+        ports:
+            - 3306:3306
+        volumes:
+            - './scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql'
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+            timeout: 5s
+            retries: 10

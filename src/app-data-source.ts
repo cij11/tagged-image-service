@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm'
 
 export const appDataSource = new DataSource({
     type: 'mysql',
-    host: '127.0.0.1',
+    host: 'db',
     port: 3306,
     username: 'tagged_image_service',
     password: 'password123',
